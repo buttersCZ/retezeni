@@ -11,6 +11,8 @@ import android.widget.ImageView;
 public class EndOfRound extends  AppCompatActivity   {
     ImageView imageViewStars;
     Context context;
+
+    //Not used class
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

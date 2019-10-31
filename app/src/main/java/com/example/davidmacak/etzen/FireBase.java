@@ -13,7 +13,7 @@ public class FireBase {
 
     FirebaseDatabase database = FirebaseDatabase.getInstance();
 
-
+    //Save data info firebase database
     public void FireBaseSave(int level,int skore, String login){
         DatabaseReference myRef = database.getReference(String.valueOf(level));
         myRef.child(login).setValue(String.valueOf(skore));

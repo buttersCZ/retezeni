@@ -34,7 +34,6 @@ import java.util.Arrays;
 import java.util.Objects;
 
 public class Game extends AppCompatActivity {
-
     ImageView imageViewStars;
     ImageView imageViewArrowDown;
     ImageView imageViewStar1;
@@ -92,16 +91,16 @@ public class Game extends AppCompatActivity {
     StringBuilder sb = new StringBuilder();
 
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.game);
-        loadItems();
-        context = this;
         intLevelGetIntent = getIntent().getIntExtra("level",1);
         getIntent().removeExtra("level");
-        loadPreferences();
+        context = this;
+
+        loadItems(); // load items from layouts
+        loadPreferences(); // load data from SharedPreferences
         loadLevel();
         loadPickers();
         loadWordEnter();
@@ -119,6 +118,47 @@ public class Game extends AppCompatActivity {
         Intent intent = new Intent(Game.this,SelectLevel.class);
         startActivity(intent);
         finish();
+    }
+
+    private void loadItems(){
+        imageButtonOK = findViewById(R.id.imageButtonOK);
+        imageButtonBack = findViewById(R.id.imageButtonBack);
+        LinearLayoutEnterWord = findViewById(R.id.LinearLayoutEnterWord);
+        LinearLayoutExitWord = findViewById(R.id.LinearLayoutExitWord);
+        LinearLayoutHistory = findViewById(R.id.LinearLayoutHistory);
+        ScrollViewHistory = findViewById(R.id.ScrollViewHistory);
+        LinearLayoutOkClick = findViewById(R.id.LinearLayoutOkClick);
+        imageViewArrowDown = findViewById(R.id.imageViewArrowDown);
+        imageViewStars = findViewById(R.id.imageViewStar);
+        linearLayoutEnd = findViewById(R.id.LinearLayoutEnd);
+        linearLayoutMain = findViewById(R.id.LinearLayoutMain);
+        FrameLayoutStars = findViewById(R.id.FrameLayoutStars);
+        imageViewStar1 = findViewById(R.id.imageViewStar1);
+        imageViewStar2 = findViewById(R.id.imageViewStar2);
+        imageViewStar3 = findViewById(R.id.imageViewStar3);
+        imageViewStar4 = findViewById(R.id.imageViewStar4);
+        imageViewStar5 = findViewById(R.id.imageViewStar5);
+        tableRowControl=findViewById(R.id.tableRowControl);
+        textViewZpet = findViewById(R.id.textView5);
+    }
+
+    private void loadPreferences(){
+        preferences = getSharedPreferences("level", MODE_PRIVATE);
+        editor = preferences.edit();
+        intLevel = preferences.getInt("levelRound", 1);
+        stringLastWord = preferences.getString("lastWord",""); // The last guessed word
+        intHistorySteps = preferences.getInt("historyCounts",0); // Number of attemps to resolve
+
+        preferences2 = getSharedPreferences(String.valueOf(intLevelGetIntent),MODE_PRIVATE);
+        editor2 = preferences2.edit();
+        if(intLevel!=intLevelGetIntent){
+
+            for(int d=0;d<stringStepsHistoryPreferences.length;d++){
+                stringStepsHistory[d] = stringStepsHistoryPreferences[d];
+            }
+        }
+
+
     }
 
     private void loadWordEnter() {
@@ -200,7 +240,6 @@ public class Game extends AppCompatActivity {
         LinearLayoutHistoryOther.setLayoutParams(layoutHistoryParams);
         LinearLayoutHistoryOther.addView(textViewCountChange);
         for (int i = 0; i < stringWordHistory.length(); i++) {
-            System.out.println("Co je tady za sracku? = "+stringWordHistory.substring(i, i + 1));
             textViewTextHistory[i] = new TextView(this);
             textViewTextHistory[i].setLayoutParams(txtParams);
             textViewTextHistory[i].setTextColor(Color.BLACK);
@@ -218,7 +257,6 @@ public class Game extends AppCompatActivity {
     }
 
     private void changeLetter(int id){
-        System.out.println("Jeden level = "+intLevel+" a druhy level = "+intLevelGetIntent);
         if(intLevel!=intLevelGetIntent){
             Toast.makeText(context,"Toto kolo jsi jiz jednou dohral",Toast.LENGTH_SHORT).show();
             return;
@@ -320,26 +358,6 @@ public class Game extends AppCompatActivity {
         picker3.setMinValue(0);
         picker3.setMaxValue(40);
         picker3.setDisplayedValues(alphabet);
-    }
-
-    private void loadPreferences(){
-        preferences = getSharedPreferences("level", MODE_PRIVATE);
-        editor = preferences.edit();
-        intLevel = preferences.getInt("levelRound", 1);
-        stringLastWord = preferences.getString("lastWord","");
-        intHistorySteps = preferences.getInt("historyCounts",0);
-        preferences2 = getSharedPreferences(String.valueOf(intLevelGetIntent),MODE_PRIVATE);
-        editor2 = preferences2.edit();
-
-
-        if(intLevel!=intLevelGetIntent){
-
-            for(int d=0;d<stringStepsHistoryPreferences.length;d++){
-                stringStepsHistory[d] = stringStepsHistoryPreferences[d];
-            }
-        }
-
-
     }
 
     private void loadLevel(){
@@ -518,7 +536,6 @@ public class Game extends AppCompatActivity {
                         if(booleanWordExist){
                             MediaPlayer mp = MediaPlayer.create(context, R.raw.okword);
                             mp.start();
-                            System.out.println("Tady to jeste jede");
 
                             stringWordEnter = stringWordAsk;
                             stringWordHistory = stringWordAsk;
@@ -546,15 +563,11 @@ public class Game extends AppCompatActivity {
                                     idPicker=-1;
                                 }
                             };
-                            System.out.println("1");
 
                             handler.postDelayed(r, 500);
                             if(stringWordEnter.equals(stringWordExit)){
-                                System.out.println("2");
-
                                 FrameLayoutStars.setVisibility(View.VISIBLE);
                                 Animation animation = AnimationUtils.loadAnimation(context,R.anim.bounce);
-                                // imageViewStar1.setAnimation(animation);
                                 DisplayMetrics dm = new DisplayMetrics();
                                 getWindowManager().getDefaultDisplay().getMetrics(dm);
                                 imageViewStar1.animate().setInterpolator( new BounceInterpolator());
@@ -960,9 +973,6 @@ public class Game extends AppCompatActivity {
         return limit;
     }
 
-
-
-
     public void stepBack(View view){
         boolean stepBackOK = true;
         if(intHistorySteps<=1 || intLevelGetIntent!=intLevel){
@@ -1011,10 +1021,8 @@ public class Game extends AppCompatActivity {
             }
         }
         else if(intLevel != intLevelGetIntent && intLevel>1){
-            System.out.println("Toto se melo odehrat!");
             intHistorySteps = preferences2.getInt("historyCounts",0);
             stringStepsHistoryPreferences = Objects.requireNonNull(preferences2.getString("historyWords", "")).split(",");
-            System.out.println("Nactena slova = "+preferences2.getString("historyWords",""));
             stringLastWord = preferences2.getString("lastWord","");
             for(int d=0;d<stringStepsHistoryPreferences.length;d++){
                 stringStepsHistory[d] = stringStepsHistoryPreferences[d];
@@ -1029,28 +1037,6 @@ public class Game extends AppCompatActivity {
         }
     }
 
-    private void loadItems(){
 
-
-        imageButtonOK = findViewById(R.id.imageButtonOK);
-        imageButtonBack = findViewById(R.id.imageButtonBack);
-        LinearLayoutEnterWord = findViewById(R.id.LinearLayoutEnterWord);
-        LinearLayoutExitWord = findViewById(R.id.LinearLayoutExitWord);
-        LinearLayoutHistory = findViewById(R.id.LinearLayoutHistory);
-        ScrollViewHistory = findViewById(R.id.ScrollViewHistory);
-        LinearLayoutOkClick = findViewById(R.id.LinearLayoutOkClick);
-        imageViewArrowDown = findViewById(R.id.imageViewArrowDown);
-        imageViewStars = findViewById(R.id.imageViewStar);
-        linearLayoutEnd = findViewById(R.id.LinearLayoutEnd);
-        linearLayoutMain = findViewById(R.id.LinearLayoutMain);
-        FrameLayoutStars = findViewById(R.id.FrameLayoutStars);
-        imageViewStar1 = findViewById(R.id.imageViewStar1);
-        imageViewStar2 = findViewById(R.id.imageViewStar2);
-        imageViewStar3 = findViewById(R.id.imageViewStar3);
-        imageViewStar4 = findViewById(R.id.imageViewStar4);
-        imageViewStar5 = findViewById(R.id.imageViewStar5);
-        tableRowControl=findViewById(R.id.tableRowControl);
-        textViewZpet = findViewById(R.id.textView5);
-    }
 
 }

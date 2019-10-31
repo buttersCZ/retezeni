@@ -16,7 +16,6 @@ public class MainActivity extends AppCompatActivity {
     Context context;
     ImageButton imageButtonGO;
     Animation animationZoom;
-    Animation animationFade;
     LinearLayout linearLayoutMain;
     TableRow tableRowHead;
     Button buttonExit;
@@ -47,13 +46,10 @@ public class MainActivity extends AppCompatActivity {
         imageButtonGO.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                /*animationFade = AnimationUtils.loadAnimation(context,R.anim.fadeout);
-                imageButtonGO.startAnimation(animationFade);*/
                 Intent intent = new Intent(MainActivity.this,SelectLevel.class);
                 startActivity(intent);
                 overridePendingTransition(R.anim.lefttoright,R.anim.righttoleft);
 
-                //   finish();
             }
         });
 
