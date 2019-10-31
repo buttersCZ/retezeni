@@ -73,6 +73,7 @@ public class PopUpEndRound extends AppCompatActivity {
         nickname = alphabet[picker1.getValue()]+alphabet[picker2.getValue()]+alphabet[picker3.getValue()]+alphabet[picker4.getValue()]+alphabet[picker5.getValue()];
         SaveScore saveScore = new SaveScore(intLevel,getIntent().getIntExtra("historySteps",1),nickname);
         Intent intent = new Intent(PopUpEndRound.this,Game.class);
+        intLevel++;
         intent.putExtra("level",intLevel);
         startActivity(intent);
         finish();

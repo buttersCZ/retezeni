@@ -21,20 +21,20 @@ import com.google.firebase.database.ValueEventListener;
 
 public class Score extends AppCompatActivity {
     Context context;
-    String list[][] = new String[20][3];
-    LinearLayout linearLayout[] = new LinearLayout[26];
-    LinearLayout linearLayoutDruhy[]= new LinearLayout[26];
-    LinearLayout linearLayoutTreti[]= new LinearLayout[26];
+    String[][] list = new String[20][3];
+    LinearLayout[] linearLayout = new LinearLayout[26];
+    LinearLayout[] linearLayoutDruhy = new LinearLayout[26];
+    LinearLayout[] linearLayoutTreti = new LinearLayout[26];
     LinearLayout linearLayoutScoreMain;
-    TableRow tableRowPrvni[]= new TableRow[26];
-    TableRow tableRowDruhy[]= new TableRow[26];
-    Button buttonPrvni[]= new Button[26];
-    Button buttonDruhy[]= new Button[26];
-    Button buttonTreti[]= new Button[26];
+    TableRow[] tableRowPrvni = new TableRow[26];
+    TableRow[] tableRowDruhy = new TableRow[26];
+    Button[] buttonPrvni = new Button[26];
+    Button[] buttonDruhy = new Button[26];
+    Button[] buttonTreti = new Button[26];
     LinearLayout.LayoutParams layoutParams;
     LinearLayout.LayoutParams layoutParamsButton;
     int poradi = 0;
-    int control = 0;
+    int control = 1;
     FirebaseDatabase database = FirebaseDatabase.getInstance();
 
     @Override
@@ -44,7 +44,7 @@ public class Score extends AppCompatActivity {
         context = this;
         linearLayoutScoreMain = findViewById(R.id.layoutScoreMainScroll);
 
-        for(int q=0;q<20;q++){
+        for(int q=1;q<20;q++){
             getScore(q);
         }
 
@@ -71,23 +71,20 @@ public class Score extends AppCompatActivity {
                 if(control==20){
                     vykresliSkore();
                 }
+                poradi = 0;
             }
-
 
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
 
             }
 
-
         });
-
-        poradi = 0;
     }
 
     private void vykresliSkore(){
         System.out.println("Ted zacal vykreslovat");
-        for(int level=0;level<20;level++) {
+        for(int level=1;level<20;level++) {
             layoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
             TableRow.LayoutParams paramsButton = new TableRow.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
             LinearLayout.LayoutParams paramsNextRow = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);

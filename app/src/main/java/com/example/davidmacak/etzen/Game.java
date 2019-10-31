@@ -31,6 +31,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.Arrays;
+import java.util.Objects;
 
 public class Game extends AppCompatActivity {
 
@@ -87,7 +88,7 @@ public class Game extends AppCompatActivity {
     Cursor cursor;
     Context context;
     boolean endHandler = true;
-    int intLevelGetIntent = 0;
+    int intLevelGetIntent = 1;
     StringBuilder sb = new StringBuilder();
 
 
@@ -98,7 +99,7 @@ public class Game extends AppCompatActivity {
         setContentView(R.layout.game);
         loadItems();
         context = this;
-        intLevelGetIntent = getIntent().getIntExtra("level",0);
+        intLevelGetIntent = getIntent().getIntExtra("level",1);
         getIntent().removeExtra("level");
         loadPreferences();
         loadLevel();
@@ -217,6 +218,7 @@ public class Game extends AppCompatActivity {
     }
 
     private void changeLetter(int id){
+        System.out.println("Jeden level = "+intLevel+" a druhy level = "+intLevelGetIntent);
         if(intLevel!=intLevelGetIntent){
             Toast.makeText(context,"Toto kolo jsi jiz jednou dohral",Toast.LENGTH_SHORT).show();
             return;
@@ -584,28 +586,33 @@ public class Game extends AppCompatActivity {
                                 imageViewStar5.animate().setDuration(7000);
                                 imageViewStar5.animate().translationY(dm.heightPixels);
                                 imageViewStar5.animate().start();
-                                if(intLevel!=intLevelGetIntent){
 
-                                }
-                                else {
-                                    intLevel++;
-                                }
-                                editor.putInt("levelRound",intLevel);
-                                editor.remove("lastWord");
-                                editor.remove("historyCounts");
-                                editor.remove("historyWords");
-                                editor.commit();
 
-                                editor2.putInt("historyCounts",intHistorySteps);
-                                editor2.putString("lastWord",stringLastWord);
-                                editor2.putString("historyWords",sb.toString());
-                                editor2.commit();
                                 final Handler handler2 = new Handler();
                                 final Runnable r2 = new Runnable() {
                                     public void run() {
+
                                         Intent intent = new Intent(Game.this,PopUpEndRound.class);
                                         intent.putExtra("intlevelik",intLevel);
                                         intent.putExtra("historySteps",intHistorySteps);
+
+                                        if(intLevel!=intLevelGetIntent){
+
+                                        }
+                                        else {
+                                            intLevel++;
+                                        }
+
+                                        editor.putInt("levelRound",intLevel);
+                                        editor.remove("lastWord");
+                                        editor.remove("historyCounts");
+                                        editor.remove("historyWords");
+                                        editor.commit();
+
+                                        editor2.putInt("historyCounts",intHistorySteps);
+                                        editor2.putString("lastWord",stringLastWord);
+                                        editor2.putString("historyWords",sb.toString());
+                                        editor2.commit();
                                         startActivity(intent);
                                         finish();
 
@@ -774,38 +781,40 @@ public class Game extends AppCompatActivity {
                                 imageViewStar5.animate().start();
 
 
-
-                                if(intLevel!=intLevelGetIntent){
-
-                                }
-                                else {
-                                    intLevel++;
-                                }
-                                editor.putInt("levelRound",intLevel);
-                                editor.remove("lastWord");
-                                editor.remove("historyCounts");
-                                editor.remove("historyWords");
-                                editor.commit();
-
-                                editor2.putString("historyWords",sb.toString());
-                                editor2.putInt("historyCounts",intHistorySteps);
-                                editor2.putString("lastWord",stringLastWord);
-                                editor2.commit();
-
                                 final Handler handler2 = new Handler();
                                 final Runnable r2 = new Runnable() {
                                     public void run() {
+
                                         Intent intent = new Intent(Game.this,PopUpEndRound.class);
                                         intent.putExtra("intlevelik",intLevel);
                                         intent.putExtra("historySteps",intHistorySteps);
+
+                                        if(intLevel!=intLevelGetIntent){
+
+                                        }
+                                        else {
+                                            intLevel++;
+                                        }
+
+
+                                        editor.putInt("levelRound",intLevel);
+                                        editor.remove("lastWord");
+                                        editor.remove("historyCounts");
+                                        editor.remove("historyWords");
+                                        editor.commit();
+
+                                        editor2.putString("historyWords",sb.toString());
+                                        editor2.putInt("historyCounts",intHistorySteps);
+                                        editor2.putString("lastWord",stringLastWord);
+                                        editor2.commit();
                                         startActivity(intent);
                                         finish();
 
                                     }
                                 };
-                                System.out.println("1");
 
                                 handler2.postDelayed(r2, 8000);
+
 
                             }
                         }
@@ -853,12 +862,7 @@ public class Game extends AppCompatActivity {
     }
 
     private boolean checkWord(String stringWordCheck){
-        if(Build.VERSION.SDK_INT>=17){
-            DB_PATH = getApplicationContext().getApplicationInfo().dataDir+"/databases/";
-        }
-        else {
-            DB_PATH = "/data/data/"+getApplicationContext().getPackageName()+"/databases/";
-        }
+        DB_PATH = getApplicationContext().getApplicationInfo().dataDir+"/databases/";
         int limitSQL = returnLimit(stringWordCheck.substring(0,1).toLowerCase());
         int limitSQLMin = stringWordCheck.substring(0,1).charAt(0) -1;//Posune pismenko hodnotu dolu jedna, aby nasel dolni limit
         String letter = Character.toString((char) limitSQLMin).toLowerCase();
@@ -867,12 +871,7 @@ public class Game extends AppCompatActivity {
         String path = DB_PATH + DB_NAME;
         mDataBase = SQLiteDatabase.openDatabase(path, null, SQLiteDatabase.OPEN_READONLY);
         cursor = mDataBase.rawQuery(sql2, null);
-        if (cursor.getCount() > 0) {
-            booleanWordExist = true;
-        }
-        else {
-            booleanWordExist = false;
-        }
+        booleanWordExist = cursor.getCount() > 0;
         return booleanWordExist;
     }
 
@@ -968,7 +967,6 @@ public class Game extends AppCompatActivity {
         boolean stepBackOK = true;
         if(intHistorySteps<=1 || intLevelGetIntent!=intLevel){
             Toast.makeText(context,"Nelze tento krok vrátit",Toast.LENGTH_SHORT).show();
-            stepBackOK = false;
         }
         else {
             intHistorySteps = intHistorySteps-2;
@@ -1007,7 +1005,7 @@ public class Game extends AppCompatActivity {
 
     private void loadHistorySteps(){
         if(intHistorySteps>0 && intLevel == intLevelGetIntent){
-            stringStepsHistoryPreferences = preferences.getString("historyWords","").split(",");
+            stringStepsHistoryPreferences = Objects.requireNonNull(preferences.getString("historyWords", "")).split(",");
             for(int d=0;d<stringStepsHistoryPreferences.length;d++){
                 stringStepsHistory[d] = stringStepsHistoryPreferences[d];
             }
@@ -1015,7 +1013,7 @@ public class Game extends AppCompatActivity {
         else if(intLevel != intLevelGetIntent && intLevel>1){
             System.out.println("Toto se melo odehrat!");
             intHistorySteps = preferences2.getInt("historyCounts",0);
-            stringStepsHistoryPreferences = preferences2.getString("historyWords","").split(",");
+            stringStepsHistoryPreferences = Objects.requireNonNull(preferences2.getString("historyWords", "")).split(",");
             System.out.println("Nactena slova = "+preferences2.getString("historyWords",""));
             stringLastWord = preferences2.getString("lastWord","");
             for(int d=0;d<stringStepsHistoryPreferences.length;d++){
