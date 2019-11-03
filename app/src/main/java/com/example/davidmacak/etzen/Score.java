@@ -11,7 +11,13 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TableRow;
+import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -32,10 +38,10 @@ public class Score extends AppCompatActivity {
     Button[] buttonDruhy = new Button[26];
     Button[] buttonTreti = new Button[26];
     LinearLayout.LayoutParams layoutParams;
-    LinearLayout.LayoutParams layoutParamsButton;
     int poradi = 0;
     int control = 1;
-    FirebaseDatabase database = FirebaseDatabase.getInstance();
+    FirebaseDatabase database;
+    FirebaseAuth mAuth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState){
@@ -43,8 +49,11 @@ public class Score extends AppCompatActivity {
         setContentView(R.layout.score);
         context = this;
         linearLayoutScoreMain = findViewById(R.id.layoutScoreMainScroll);
+        mAuth = FirebaseAuth.getInstance();
+        mAuth.signInAnonymously();
+        database= FirebaseDatabase.getInstance();
 
-        for(int q=1;q<20;q++){
+        for(int q=1;q<11;q++){
             getScore(q);
         }
 
@@ -68,7 +77,7 @@ public class Score extends AppCompatActivity {
 
 
                 }
-                if(control==20){
+                if(control==11){
                     vykresliSkore();
                 }
                 poradi = 0;
@@ -83,8 +92,8 @@ public class Score extends AppCompatActivity {
     }
 
     private void vykresliSkore(){
-        System.out.println("Ted zacal vykreslovat");
-        for(int level=1;level<20;level++) {
+
+        for(int level=1;level<11;level++) {
             layoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
             TableRow.LayoutParams paramsButton = new TableRow.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
             LinearLayout.LayoutParams paramsNextRow = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);

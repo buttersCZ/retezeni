@@ -66,7 +66,7 @@ public class Game extends AppCompatActivity {
     LinearLayout LinearLayoutHistoryOther;
     LinearLayout linearLayoutEnd;
     LinearLayout linearLayoutMain;
-    FrameLayout.LayoutParams lparams2 = new FrameLayout.LayoutParams(165,150);
+    FrameLayout.LayoutParams lparams2 = new FrameLayout.LayoutParams(130,120);
     FrameLayout FrameLayoutStars;
     FrameLayout[] frameLayoutEnter;
     FrameLayout[] frameLayoutExit;
@@ -76,8 +76,11 @@ public class Game extends AppCompatActivity {
     NumberPicker picker1;
     NumberPicker picker2;
     NumberPicker picker3;
+    NumberPicker picker4;
+    NumberPicker picker5;
     ImageButton imageButtonOK;
     ImageButton imageButtonBack;
+    ImageView ImageViewSound;
     int idPicker;
     boolean booleanWordExist=true;
     int intHistorySteps = 0;
@@ -88,6 +91,7 @@ public class Game extends AppCompatActivity {
     Context context;
     boolean endHandler = true;
     int intLevelGetIntent = 1;
+    int intSoundSettings;
     StringBuilder sb = new StringBuilder();
 
 
@@ -105,9 +109,9 @@ public class Game extends AppCompatActivity {
         loadPickers();
         loadWordEnter();
         loadWordExit();
-        loadListeners();
         Db db = new Db(getApplicationContext());
         db.createDatabase();
+        loadListeners();
 
 
     }
@@ -140,6 +144,7 @@ public class Game extends AppCompatActivity {
         imageViewStar5 = findViewById(R.id.imageViewStar5);
         tableRowControl=findViewById(R.id.tableRowControl);
         textViewZpet = findViewById(R.id.textView5);
+        ImageViewSound = findViewById(R.id.ImageViewSound);
     }
 
     private void loadPreferences(){
@@ -148,14 +153,18 @@ public class Game extends AppCompatActivity {
         intLevel = preferences.getInt("levelRound", 1);
         stringLastWord = preferences.getString("lastWord",""); // The last guessed word
         intHistorySteps = preferences.getInt("historyCounts",0); // Number of attemps to resolve
-
+        intSoundSettings = preferences.getInt("sound",1);
+        if(intSoundSettings>0){
+            ImageViewSound.setImageDrawable(getDrawable(R.drawable.sound));
+        }
+        else {
+            ImageViewSound.setImageDrawable(getDrawable(R.drawable.nosound));
+        }
         preferences2 = getSharedPreferences(String.valueOf(intLevelGetIntent),MODE_PRIVATE);
         editor2 = preferences2.edit();
         if(intLevel!=intLevelGetIntent){
 
-            for(int d=0;d<stringStepsHistoryPreferences.length;d++){
-                stringStepsHistory[d] = stringStepsHistoryPreferences[d];
-            }
+            System.arraycopy(stringStepsHistoryPreferences, 0, stringStepsHistory, 0, stringStepsHistoryPreferences.length);
         }
 
 
@@ -165,14 +174,14 @@ public class Game extends AppCompatActivity {
         textViewTextEnter = new TextView[stringWordEnter.length()];
         frameLayoutEnter = new FrameLayout[stringWordEnter.length()];
         FrameLayout.LayoutParams lparams;
-        lparams= new FrameLayout.LayoutParams(165, 150);
+        lparams= new FrameLayout.LayoutParams(130, 120);
         lparams.gravity = Gravity.CENTER;
-        LinearLayout.LayoutParams txtParams = new LinearLayout.LayoutParams(165, 150);
+        LinearLayout.LayoutParams txtParams = new LinearLayout.LayoutParams(130, 120);
         for (int i = 0; i < stringWordEnter.length(); i++) {
             textViewTextEnter[i] = new TextView(this);
             textViewTextEnter[i].setLayoutParams(txtParams);
             textViewTextEnter[i].setTextColor(Color.WHITE);
-            textViewTextEnter[i].setTextSize(30);
+            textViewTextEnter[i].setTextSize(24);
             textViewTextEnter[i].setGravity(Gravity.CENTER_VERTICAL | Gravity.CENTER_HORIZONTAL);
             frameLayoutEnter[i] = new FrameLayout(this);
             frameLayoutEnter[i].setBackground(getDrawable(R.drawable.border_enter));
@@ -194,9 +203,9 @@ public class Game extends AppCompatActivity {
     private void loadWordExit() {
         textViewTextExit = new TextView[stringWordExit.length()];
         frameLayoutExit = new FrameLayout[stringWordExit.length()];
-        FrameLayout.LayoutParams lparams = new FrameLayout.LayoutParams(150, 120);
+        FrameLayout.LayoutParams lparams = new FrameLayout.LayoutParams(130, 120);
         lparams.gravity = Gravity.CENTER;
-        LinearLayout.LayoutParams txtParams = new LinearLayout.LayoutParams(150, 120);
+        LinearLayout.LayoutParams txtParams = new LinearLayout.LayoutParams(130, 120);
         for (int i = 0; i < stringWordExit.length(); i++) {
             textViewTextExit[i] = new TextView(this);
             textViewTextExit[i].setLayoutParams(txtParams);
@@ -258,7 +267,7 @@ public class Game extends AppCompatActivity {
 
     private void changeLetter(int id){
         if(intLevel!=intLevelGetIntent){
-            Toast.makeText(context,"Toto kolo jsi jiz jednou dohral",Toast.LENGTH_SHORT).show();
+            Toast.makeText(context,getString(R.string.not_actual_level),Toast.LENGTH_SHORT).show();
             return;
         }
         if(endHandler){
@@ -326,14 +335,73 @@ public class Game extends AppCompatActivity {
                             break;
                         case 3:
                             LinearLayoutEnterWord.removeAllViews();
+                            picker4.setValue(Arrays.asList(alphabet).indexOf(textViewTextEnter[id].getText()));
+                            picker4.setLayoutParams(lparams2);
+                            LinearLayoutEnterWord.addView(frameLayoutEnter[0]);
+                            LinearLayoutEnterWord.addView(frameLayoutEnter[1]);
+                            LinearLayoutEnterWord.addView(frameLayoutEnter[2]);
+                            LinearLayoutEnterWord.addView(picker4);
+                            break;
+                    }
+                    break;
+
+                case 5:
+                    switch (id){
+                        case 0:
+                            LinearLayoutEnterWord.removeAllViews();
+                            picker1.setValue(Arrays.asList(alphabet).indexOf(textViewTextEnter[id].getText()));
+                            picker1.setLayoutParams(lparams2);
+                            LinearLayoutEnterWord.addView(picker1);
+                            LinearLayoutEnterWord.addView(frameLayoutEnter[1]);
+                            LinearLayoutEnterWord.addView(frameLayoutEnter[2]);
+                            LinearLayoutEnterWord.addView(frameLayoutEnter[3]);
+                            LinearLayoutEnterWord.addView(frameLayoutEnter[4]);
+
+                            break;
+                        case 1:
+                            LinearLayoutEnterWord.removeAllViews();
+                            picker2.setValue(Arrays.asList(alphabet).indexOf(textViewTextEnter[id].getText()));
+                            picker2.setLayoutParams(lparams2);
+                            LinearLayoutEnterWord.addView(frameLayoutEnter[0]);
+                            LinearLayoutEnterWord.addView(picker2);
+                            LinearLayoutEnterWord.addView(frameLayoutEnter[2]);
+                            LinearLayoutEnterWord.addView(frameLayoutEnter[3]);
+                            LinearLayoutEnterWord.addView(frameLayoutEnter[4]);
+
+                            break;
+                        case 2:
+                            LinearLayoutEnterWord.removeAllViews();
                             picker3.setValue(Arrays.asList(alphabet).indexOf(textViewTextEnter[id].getText()));
                             picker3.setLayoutParams(lparams2);
                             LinearLayoutEnterWord.addView(frameLayoutEnter[0]);
                             LinearLayoutEnterWord.addView(frameLayoutEnter[1]);
-                            LinearLayoutEnterWord.addView(frameLayoutEnter[2]);
                             LinearLayoutEnterWord.addView(picker3);
+                            LinearLayoutEnterWord.addView(frameLayoutEnter[3]);
+                            LinearLayoutEnterWord.addView(frameLayoutEnter[4]);
+
+                            break;
+                        case 3:
+                            LinearLayoutEnterWord.removeAllViews();
+                            picker4.setValue(Arrays.asList(alphabet).indexOf(textViewTextEnter[id].getText()));
+                            picker4.setLayoutParams(lparams2);
+                            LinearLayoutEnterWord.addView(frameLayoutEnter[0]);
+                            LinearLayoutEnterWord.addView(frameLayoutEnter[1]);
+                            LinearLayoutEnterWord.addView(frameLayoutEnter[2]);
+                            LinearLayoutEnterWord.addView(picker4);
+                            LinearLayoutEnterWord.addView(frameLayoutEnter[4]);
+                            break;
+                        case 4:
+                            LinearLayoutEnterWord.removeAllViews();
+                            picker5.setValue(Arrays.asList(alphabet).indexOf(textViewTextEnter[id].getText()));
+                            picker5.setLayoutParams(lparams2);
+                            LinearLayoutEnterWord.addView(frameLayoutEnter[0]);
+                            LinearLayoutEnterWord.addView(frameLayoutEnter[1]);
+                            LinearLayoutEnterWord.addView(frameLayoutEnter[2]);
+                            LinearLayoutEnterWord.addView(frameLayoutEnter[3]);
+                            LinearLayoutEnterWord.addView(picker5);
                             break;
                     }
+
                     break;
             }
 
@@ -348,107 +416,81 @@ public class Game extends AppCompatActivity {
         picker1.setDisplayedValues(alphabet);
         picker1.setValue(3);
         picker1.setBackground(getDrawable(R.drawable.picker));
+        picker1.setLayoutParams(lparams2);
         picker2 = new NumberPicker(this);
         picker2.setBackground(getDrawable(R.drawable.picker));
         picker2.setMinValue(0);
         picker2.setMaxValue(40);
         picker2.setDisplayedValues(alphabet);
+        picker2.setLayoutParams(lparams2);
         picker3 = new NumberPicker(this);
         picker3.setBackground(getDrawable(R.drawable.picker));
         picker3.setMinValue(0);
         picker3.setMaxValue(40);
         picker3.setDisplayedValues(alphabet);
+        picker3.setLayoutParams(lparams2);
+        picker4 = new NumberPicker(this);
+        picker4.setBackground(getDrawable(R.drawable.picker));
+        picker4.setMinValue(0);
+        picker4.setMaxValue(40);
+        picker4.setDisplayedValues(alphabet);
+        picker4.setLayoutParams(lparams2);
+        picker5 = new NumberPicker(this);
+        picker5.setBackground(getDrawable(R.drawable.picker));
+        picker5.setMinValue(0);
+        picker5.setMaxValue(40);
+        picker5.setDisplayedValues(alphabet);
+        picker5.setLayoutParams(lparams2);
+
     }
 
     private void loadLevel(){
         int id = intLevelGetIntent;
-        if(intLevel!= intLevelGetIntent && intLevelGetIntent!=0){
-            id = intLevelGetIntent;
-        }
-        else if (intLevelGetIntent==0) {
+
+        if (intLevelGetIntent==0) {
             id = intLevel;
         }
 
         switch (id) {
             case 1:
-                stringWordEnter = "LUM";
-                stringWordExit = "RUM";
-                stringWordHistory = "CIT";
+                stringWordEnter = getString(R.string.level_Enter_1);
+                stringWordExit = getString(R.string.level_Exit_1);
                 break;
             case 2:
-                stringWordEnter = "LUSK";
-                stringWordExit = "RADA";
-                stringWordHistory = "POLE";
+                stringWordEnter = getString(R.string.level_Enter_2);
+                stringWordExit = getString(R.string.level_Exit_2);
                 break;
             case 3:
-                stringWordEnter = "ROHY";
-                stringWordExit = "KOZA";
-                stringWordHistory = "POLE";
+                stringWordEnter = getString(R.string.level_Enter_3);
+                stringWordExit = getString(R.string.level_Exit_3);
                 break;
             case 4:
-                stringWordEnter = "PRUTY";
-                stringWordExit = "RUNDA";
-                stringWordHistory = "POLE";
+                stringWordEnter = getString(R.string.level_Enter_4);
+                stringWordExit = getString(R.string.level_Exit_4);
                 break;
             case 5:
-                stringWordEnter = "LEPA";
-                stringWordExit = "KOZA";
-                stringWordHistory = "POLE";
+                stringWordEnter = getString(R.string.level_Enter_5);
+                stringWordExit = getString(R.string.level_Exit_5);
                 break;
             case 6:
-                stringWordEnter = "ROHY";
-                stringWordExit = "KOZA";
-                stringWordHistory = "POLE";
+                stringWordEnter = getString(R.string.level_Enter_6);
+                stringWordExit = getString(R.string.level_Exit_6);
                 break;
             case 7:
-                stringWordEnter = "ROHY";
-                stringWordExit = "KOZA";
-                stringWordHistory = "POLE";
+                stringWordEnter = getString(R.string.level_Enter_7);
+                stringWordExit = getString(R.string.level_Exit_7);
                 break;
             case 8:
-                stringWordEnter = "ROHY";
-                stringWordExit = "KOZA";
-                stringWordHistory = "POLE";
+                stringWordEnter = getString(R.string.level_Enter_8);
+                stringWordExit = getString(R.string.level_Exit_8);
                 break;
             case 9:
-                stringWordEnter = "ROHY";
-                stringWordExit = "KOZA";
-                stringWordHistory = "POLE";
+                stringWordEnter = getString(R.string.level_Enter_9);
+                stringWordExit = getString(R.string.level_Exit_9);
                 break;
             case 10:
-                stringWordEnter = "ROHY";
-                stringWordExit = "KOZA";
-                stringWordHistory = "POLE";
-                break;
-            case 11:
-                stringWordEnter = "ROHY";
-                stringWordExit = "KOZA";
-                stringWordHistory = "POLE";
-                break;
-            case 12:
-                stringWordEnter = "ROHY";
-                stringWordExit = "KOZA";
-                stringWordHistory = "POLE";
-                break;
-            case 13:
-                stringWordEnter = "ROHY";
-                stringWordExit = "KOZA";
-                stringWordHistory = "POLE";
-                break;
-            case 14:
-                stringWordEnter = "ROHY";
-                stringWordExit = "KOZA";
-                stringWordHistory = "POLE";
-                break;
-            case 15:
-                stringWordEnter = "ROHY";
-                stringWordExit = "KOZA";
-                stringWordHistory = "POLE";
-                break;
-            case 16:
-                stringWordEnter = "ROHY";
-                stringWordExit = "KOZA";
-                stringWordHistory = "POLE";
+                stringWordEnter = getString(R.string.level_Enter_10);
+                stringWordExit = getString(R.string.level_Exit_10);
                 break;
 
         }
@@ -477,388 +519,17 @@ public class Game extends AppCompatActivity {
         imageButtonOK.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(intLevel!=intLevelGetIntent){
-                    Toast.makeText(context,"Toto kolo jsi jiz jednou dohral",Toast.LENGTH_SHORT).show();
-                    return;
-                }
-
-                String stringWordAsk="";
-                stringWordHistory = stringWordEnter;
-                for (int w = 0; w < stringWordEnter.length(); w++) {
-                    if (w == idPicker && idPicker>-1 && endHandler) {
-                        endHandler = false;
-                        switch (stringWordEnter.length()){
-                            case 3:
-                                switch (idPicker) {
-                                    case 0:
-                                        pismeno = Arrays.asList(alphabet).get(picker1.getValue());
-                                        stringWordAsk = pismeno.concat(stringWordEnter.substring(1,2).concat(stringWordEnter.substring(2,3)));
-                                        checkWord(stringWordAsk);
-                                        break;
-                                    case 1:
-                                        pismeno = Arrays.asList(alphabet).get(picker2.getValue());
-                                        stringWordAsk = stringWordEnter.substring(0,1).concat(pismeno).concat(stringWordEnter.substring(2,3));
-                                        checkWord(stringWordAsk);
-                                        break;
-                                    case 2:
-                                        pismeno = Arrays.asList(alphabet).get(picker3.getValue());
-                                        stringWordAsk = stringWordEnter.substring(0,1).concat(stringWordEnter.substring(1,2)).concat(pismeno);
-                                        checkWord(stringWordAsk);
-                                        break;
-                                }
-                                break;
-                            case 4:
-                                switch (idPicker) {
-                                    case 0:
-                                        pismeno = Arrays.asList(alphabet).get(picker1.getValue());
-                                        stringWordAsk = pismeno.concat(stringWordEnter.substring(1,2).concat(stringWordEnter.substring(2,3)).concat(stringWordEnter.substring(3,4)));
-                                        checkWord(stringWordAsk);
-                                        break;
-                                    case 1:
-                                        pismeno = Arrays.asList(alphabet).get(picker2.getValue());
-                                        stringWordAsk = stringWordEnter.substring(0,1).concat(pismeno).concat(stringWordEnter.substring(2,3)).concat(stringWordEnter.substring(3,4));
-                                        checkWord(stringWordAsk);
-                                        break;
-                                    case 2:
-                                        pismeno = Arrays.asList(alphabet).get(picker3.getValue());
-                                        stringWordAsk = stringWordEnter.substring(0,1).concat(stringWordEnter.substring(1,2)).concat(pismeno).concat(stringWordEnter.substring(3,4));
-                                        checkWord(stringWordAsk);
-                                        break;
-                                    case 3:
-                                        pismeno = Arrays.asList(alphabet).get(picker3.getValue());
-                                        stringWordAsk = stringWordEnter.substring(0,1).concat(stringWordEnter.substring(1,2)).concat(stringWordEnter.substring(2,3)).concat(pismeno);
-                                        checkWord(stringWordAsk);
-                                        break;
-                                }
-                                break;
-                        }
-
-                        if(booleanWordExist){
-                            MediaPlayer mp = MediaPlayer.create(context, R.raw.okword);
-                            mp.start();
-
-                            stringWordEnter = stringWordAsk;
-                            stringWordHistory = stringWordAsk;
-                            stringLastWord = stringWordAsk;
-                            stringStepsHistory[intHistorySteps]= stringWordAsk;
-                            sb = new StringBuilder();
-                            for(int d=0;d<=intHistorySteps;d++){
-                                sb.append(stringStepsHistory[d]).append(",");
-
-                            }
-                            intHistorySteps++;
-                            editor.putString("historyWords",sb.toString());
-                            editor.putInt("historyCounts",intHistorySteps);
-                            editor.putString("lastWord",stringLastWord);
-                            editor.commit();
-                            loadWordHistory();
-                            LinearLayoutEnterWord.removeAllViews();
-                            loadWordEnter();
-                            frameLayoutEnter[idPicker].setBackground(getDrawable(R.drawable.border_pl));
-                            final Handler handler = new Handler();
-                            final Runnable r = new Runnable() {
-                                public void run() {
-                                    frameLayoutEnter[idPicker].setBackground(getDrawable(R.drawable.border_enter));
-                                    endHandler= true;
-                                    idPicker=-1;
-                                }
-                            };
-
-                            handler.postDelayed(r, 500);
-                            if(stringWordEnter.equals(stringWordExit)){
-                                FrameLayoutStars.setVisibility(View.VISIBLE);
-                                Animation animation = AnimationUtils.loadAnimation(context,R.anim.bounce);
-                                DisplayMetrics dm = new DisplayMetrics();
-                                getWindowManager().getDefaultDisplay().getMetrics(dm);
-                                imageViewStar1.animate().setInterpolator( new BounceInterpolator());
-                                imageViewStar1.animate().setStartDelay(10);
-                                imageViewStar1.animate().setDuration(7000);
-                                imageViewStar1.animate().translationY(dm.heightPixels);
-                                imageViewStar1.animate().start();
-                                //  imageViewStar1.setAnimation(animation);
-                                imageViewStar2.animate().setInterpolator( new BounceInterpolator());
-                                imageViewStar2.animate().setStartDelay(30);
-                                imageViewStar2.animate().setDuration(6000);
-                                imageViewStar2.animate().translationY(dm.heightPixels);
-                                imageViewStar2.animate().start();
-
-                                imageViewStar3.animate().setInterpolator( new BounceInterpolator());
-                                imageViewStar3.animate().setStartDelay(5);
-                                imageViewStar3.animate().setDuration(8000);
-                                imageViewStar3.animate().translationY(dm.heightPixels);
-                                imageViewStar3.animate().start();
-
-                                imageViewStar4.animate().setInterpolator( new BounceInterpolator());
-                                imageViewStar4.animate().setStartDelay(15);
-                                imageViewStar4.animate().setDuration(7000);
-                                imageViewStar4.animate().translationY(dm.heightPixels);
-                                imageViewStar5.animate().start();
-
-                                imageViewStar5.animate().setInterpolator( new BounceInterpolator());
-                                imageViewStar5.animate().setStartDelay(20);
-                                imageViewStar5.animate().setDuration(7000);
-                                imageViewStar5.animate().translationY(dm.heightPixels);
-                                imageViewStar5.animate().start();
-
-
-                                final Handler handler2 = new Handler();
-                                final Runnable r2 = new Runnable() {
-                                    public void run() {
-
-                                        Intent intent = new Intent(Game.this,PopUpEndRound.class);
-                                        intent.putExtra("intlevelik",intLevel);
-                                        intent.putExtra("historySteps",intHistorySteps);
-
-                                        if(intLevel!=intLevelGetIntent){
-
-                                        }
-                                        else {
-                                            intLevel++;
-                                        }
-
-                                        editor.putInt("levelRound",intLevel);
-                                        editor.remove("lastWord");
-                                        editor.remove("historyCounts");
-                                        editor.remove("historyWords");
-                                        editor.commit();
-
-                                        editor2.putInt("historyCounts",intHistorySteps);
-                                        editor2.putString("lastWord",stringLastWord);
-                                        editor2.putString("historyWords",sb.toString());
-                                        editor2.commit();
-                                        startActivity(intent);
-                                        finish();
-
-                                    }
-                                };
-
-                                handler2.postDelayed(r2, 8000);
-
-                            }
-                        }
-                        else {
-                            MediaPlayer mp = MediaPlayer.create(context, R.raw.errorsound);
-                            mp.start();
-                            LinearLayoutEnterWord.removeAllViews();
-                            loadWordEnter();
-                            frameLayoutEnter[idPicker].setBackground(getDrawable(R.drawable.border_red));
-                            Animation animation = AnimationUtils.loadAnimation(context,R.anim.shake);
-                            frameLayoutEnter[idPicker].setAnimation(animation);
-                            final Handler handler = new Handler();
-                            final Runnable r = new Runnable() {
-                                public void run() {
-                                    frameLayoutEnter[idPicker].setBackground(getDrawable(R.drawable.border_enter));
-                                    endHandler= true;
-                                    idPicker=-1;
-                                    //handler.postDelayed(this, 3000);
-                                }
-                            };
-
-                            handler.postDelayed(r, 500);
-                        }
-
-                    }
-                    else if(idPicker<0){
-                        Toast.makeText(context,"Vyber písmeno!",Toast.LENGTH_SHORT).show();
-                    }
-                }
+                tryIt();
             }
         });
 
         LinearLayoutOkClick.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
-                if(intLevel!=intLevelGetIntent){
-                    Toast.makeText(context,"Toto kolo jsi jiz jednou dohral",Toast.LENGTH_SHORT).show();
-                    return;
-                }
-
-                String stringWordAsk="";
-                stringWordHistory = stringWordEnter;
-                for (int w = 0; w < stringWordEnter.length(); w++) {
-                    if (w == idPicker && idPicker>-1 && endHandler) {
-                        endHandler = false;
-                        switch (stringWordEnter.length()){
-                            case 3:
-                                switch (idPicker) {
-                                    case 0:
-                                        pismeno = Arrays.asList(alphabet).get(picker1.getValue());
-                                        stringWordAsk = pismeno.concat(stringWordEnter.substring(1,2).concat(stringWordEnter.substring(2,3)));
-                                        checkWord(stringWordAsk);
-                                        break;
-                                    case 1:
-                                        pismeno = Arrays.asList(alphabet).get(picker2.getValue());
-                                        stringWordAsk = stringWordEnter.substring(0,1).concat(pismeno).concat(stringWordEnter.substring(2,3));
-                                        checkWord(stringWordAsk);
-                                        break;
-                                    case 2:
-                                        pismeno = Arrays.asList(alphabet).get(picker3.getValue());
-                                        stringWordAsk = stringWordEnter.substring(0,1).concat(stringWordEnter.substring(1,2)).concat(pismeno);
-                                        checkWord(stringWordAsk);
-                                        break;
-                                }
-                                break;
-                            case 4:
-                                switch (idPicker) {
-                                    case 0:
-                                        pismeno = Arrays.asList(alphabet).get(picker1.getValue());
-                                        stringWordAsk = pismeno.concat(stringWordEnter.substring(1,2).concat(stringWordEnter.substring(2,3)).concat(stringWordEnter.substring(3,4)));
-                                        checkWord(stringWordAsk);
-                                        break;
-                                    case 1:
-                                        pismeno = Arrays.asList(alphabet).get(picker2.getValue());
-                                        stringWordAsk = stringWordEnter.substring(0,1).concat(pismeno).concat(stringWordEnter.substring(2,3)).concat(stringWordEnter.substring(3,4));
-                                        checkWord(stringWordAsk);
-                                        break;
-                                    case 2:
-                                        pismeno = Arrays.asList(alphabet).get(picker3.getValue());
-                                        stringWordAsk = stringWordEnter.substring(0,1).concat(stringWordEnter.substring(1,2)).concat(pismeno).concat(stringWordEnter.substring(3,4));
-                                        checkWord(stringWordAsk);
-                                        break;
-                                    case 3:
-                                        pismeno = Arrays.asList(alphabet).get(picker3.getValue());
-                                        stringWordAsk = stringWordEnter.substring(0,1).concat(stringWordEnter.substring(1,2)).concat(stringWordEnter.substring(2,3)).concat(pismeno);
-                                        checkWord(stringWordAsk);
-                                        break;
-                                }
-                                break;
-                        }
-
-                        if(booleanWordExist){
-                            MediaPlayer mp = MediaPlayer.create(context, R.raw.okword);
-                            mp.start();
-                            stringWordEnter = stringWordAsk;
-                            stringWordHistory = stringWordEnter;
-                            stringLastWord = stringWordAsk;
-                            stringStepsHistory[intHistorySteps]= stringWordHistory;
-                            sb = new StringBuilder();
-                            for(int d=0;d<=intHistorySteps;d++){
-                                sb.append(stringStepsHistory[d]).append(",");
-
-                            }
-                            intHistorySteps++;
-                            editor.putString("historyWords",sb.toString());
-                            editor.putInt("historyCounts",intHistorySteps);
-                            editor.putString("lastWord",stringLastWord);
-                            editor.commit();
-                            loadWordHistory();
-                            LinearLayoutEnterWord.removeAllViews();
-                            loadWordEnter();
-                            frameLayoutEnter[idPicker].setBackground(getDrawable(R.drawable.border_pl));
-                            final Handler handler = new Handler();
-                            final Runnable r = new Runnable() {
-                                public void run() {
-                                    frameLayoutEnter[idPicker].setBackground(getDrawable(R.drawable.border_enter));
-                                    endHandler= true;
-                                    idPicker=-1;
-                                }
-                            };
-                            handler.postDelayed(r, 500);
-
-                            if(stringWordEnter.equals(stringWordExit)){
-
-                                FrameLayoutStars.setVisibility(View.VISIBLE);
-                                Animation animation = AnimationUtils.loadAnimation(context,R.anim.bounce);
-                                // imageViewStar1.setAnimation(animation);
-                                DisplayMetrics dm = new DisplayMetrics();
-                                getWindowManager().getDefaultDisplay().getMetrics(dm);
-                                imageViewStar1.animate().setInterpolator( new BounceInterpolator());
-                                imageViewStar1.animate().setStartDelay(10);
-                                imageViewStar1.animate().setDuration(7000);
-                                imageViewStar1.animate().translationY(dm.heightPixels);
-                                imageViewStar1.animate().start();
-                                //  imageViewStar1.setAnimation(animation);
-                                imageViewStar2.animate().setInterpolator( new BounceInterpolator());
-                                imageViewStar2.animate().setStartDelay(30);
-                                imageViewStar2.animate().setDuration(6000);
-                                imageViewStar2.animate().translationY(dm.heightPixels);
-                                imageViewStar2.animate().start();
-
-                                imageViewStar3.animate().setInterpolator( new BounceInterpolator());
-                                imageViewStar3.animate().setStartDelay(5);
-                                imageViewStar3.animate().setDuration(8000);
-                                imageViewStar3.animate().translationY(dm.heightPixels);
-                                imageViewStar3.animate().start();
-
-                                imageViewStar4.animate().setInterpolator( new BounceInterpolator());
-                                imageViewStar4.animate().setStartDelay(15);
-                                imageViewStar4.animate().setDuration(7000);
-                                imageViewStar4.animate().translationY(dm.heightPixels);
-                                imageViewStar5.animate().start();
-
-                                imageViewStar5.animate().setInterpolator( new BounceInterpolator());
-                                imageViewStar5.animate().setStartDelay(20);
-                                imageViewStar5.animate().setDuration(7000);
-                                imageViewStar5.animate().translationY(dm.heightPixels);
-                                imageViewStar5.animate().start();
-
-
-                                final Handler handler2 = new Handler();
-                                final Runnable r2 = new Runnable() {
-                                    public void run() {
-
-                                        Intent intent = new Intent(Game.this,PopUpEndRound.class);
-                                        intent.putExtra("intlevelik",intLevel);
-                                        intent.putExtra("historySteps",intHistorySteps);
-
-                                        if(intLevel!=intLevelGetIntent){
-
-                                        }
-                                        else {
-                                            intLevel++;
-                                        }
-
-
-                                        editor.putInt("levelRound",intLevel);
-                                        editor.remove("lastWord");
-                                        editor.remove("historyCounts");
-                                        editor.remove("historyWords");
-                                        editor.commit();
-
-                                        editor2.putString("historyWords",sb.toString());
-                                        editor2.putInt("historyCounts",intHistorySteps);
-                                        editor2.putString("lastWord",stringLastWord);
-                                        editor2.commit();
-                                        startActivity(intent);
-                                        finish();
-
-                                    }
-                                };
-
-                                handler2.postDelayed(r2, 8000);
-
-
-                            }
-                        }
-                        else {
-                            MediaPlayer mp = MediaPlayer.create(context, R.raw.errorsound);
-                            mp.start();
-                            LinearLayoutEnterWord.removeAllViews();
-                            loadWordEnter();
-                            frameLayoutEnter[idPicker].setBackground(getDrawable(R.drawable.border_red));
-                            Animation animation = AnimationUtils.loadAnimation(context,R.anim.shake);
-                            frameLayoutEnter[idPicker].setAnimation(animation);
-                            final Handler handler = new Handler();
-                            final Runnable r = new Runnable() {
-                                public void run() {
-                                    frameLayoutEnter[idPicker].setBackground(getDrawable(R.drawable.border_enter));
-                                    endHandler= true;
-                                    idPicker=-1;
-                                    //handler.postDelayed(this, 3000);
-                                }
-                            };
-
-                            handler.postDelayed(r, 500);
-                        }
-
-                    }
-                    else if(idPicker<0){
-                        Toast.makeText(context,"Vyber písmeno!",Toast.LENGTH_SHORT).show();
-                    }
-                }
+                tryIt();
             }
         });
+
         imageButtonBack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -870,6 +541,25 @@ public class Game extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 stepBack(textViewZpet);
+            }
+        });
+
+        ImageViewSound.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                intSoundSettings = preferences.getInt("sound",1);
+                if(intSoundSettings>0){
+                    ImageViewSound.setImageDrawable(getDrawable(R.drawable.nosound));
+                    editor.putInt("sound",0);
+                }
+                else {
+                    ImageViewSound.setImageDrawable(getDrawable(R.drawable.sound));
+                    editor.putInt("sound",1);
+
+                }
+                editor.commit();
+                intSoundSettings = preferences.getInt("sound",1);
+
             }
         });
     }
@@ -974,9 +664,8 @@ public class Game extends AppCompatActivity {
     }
 
     public void stepBack(View view){
-        boolean stepBackOK = true;
         if(intHistorySteps<=1 || intLevelGetIntent!=intLevel){
-            Toast.makeText(context,"Nelze tento krok vrátit",Toast.LENGTH_SHORT).show();
+            Toast.makeText(context,getString(R.string.step_back),Toast.LENGTH_SHORT).show();
         }
         else {
             intHistorySteps = intHistorySteps-2;
@@ -995,7 +684,7 @@ public class Game extends AppCompatActivity {
             editor.commit();
             LinearLayoutHistory.removeAllViews();
             TextView textViewZkouska = new TextView(context);
-            textViewZkouska.setText("Kroky:");
+            textViewZkouska.setText(getString(R.string.steps));
             textViewZkouska.setGravity(Gravity.CENTER);
             LinearLayoutHistory.addView(textViewZkouska,0);
             loadHistorySteps();
@@ -1016,27 +705,241 @@ public class Game extends AppCompatActivity {
     private void loadHistorySteps(){
         if(intHistorySteps>0 && intLevel == intLevelGetIntent){
             stringStepsHistoryPreferences = Objects.requireNonNull(preferences.getString("historyWords", "")).split(",");
-            for(int d=0;d<stringStepsHistoryPreferences.length;d++){
-                stringStepsHistory[d] = stringStepsHistoryPreferences[d];
-            }
+            System.arraycopy(stringStepsHistoryPreferences, 0, stringStepsHistory, 0, stringStepsHistoryPreferences.length);
         }
         else if(intLevel != intLevelGetIntent && intLevel>1){
             intHistorySteps = preferences2.getInt("historyCounts",0);
             stringStepsHistoryPreferences = Objects.requireNonNull(preferences2.getString("historyWords", "")).split(",");
             stringLastWord = preferences2.getString("lastWord","");
-            for(int d=0;d<stringStepsHistoryPreferences.length;d++){
-                stringStepsHistory[d] = stringStepsHistoryPreferences[d];
-            }
+            System.arraycopy(stringStepsHistoryPreferences, 0, stringStepsHistory, 0, stringStepsHistoryPreferences.length);
         }
         else {
             // stringStepsHistoryPreferences[0] = stringLastWord;
-            for(int d=0;d<stringStepsHistoryPreferences.length;d++){
-
-                stringStepsHistory[d] = stringStepsHistoryPreferences[d];
-            }
+            System.arraycopy(stringStepsHistoryPreferences, 0, stringStepsHistory, 0, stringStepsHistoryPreferences.length);
         }
     }
 
+    private void tryIt(){
+        //Control if is player in actual level
+        if(intLevel!=intLevelGetIntent){
+            Toast.makeText(context,getString(R.string.not_actual_level),Toast.LENGTH_SHORT).show();
+            return;
+        }
 
+        String stringWordAsk="";
+        stringWordHistory = stringWordEnter; // As last word to display, save guess word
+        for (int w = 0; w < stringWordEnter.length(); w++) { // Go throw all pickers and select which one was choosen
+            if (w == idPicker && endHandler) {
+                endHandler = false;
+                switch (stringWordEnter.length()){
+                    case 3:
+                        switch (idPicker) {
+                            case 0:
+                                pismeno = Arrays.asList(alphabet).get(picker1.getValue());
+                                stringWordAsk = pismeno.concat(stringWordEnter.substring(1,2).concat(stringWordEnter.substring(2,3)));
+                                checkWord(stringWordAsk);
+                                break;
+                            case 1:
+                                pismeno = Arrays.asList(alphabet).get(picker2.getValue());
+                                stringWordAsk = stringWordEnter.substring(0,1).concat(pismeno).concat(stringWordEnter.substring(2,3));
+                                checkWord(stringWordAsk);
+                                break;
+                            case 2:
+                                pismeno = Arrays.asList(alphabet).get(picker3.getValue());
+                                stringWordAsk = stringWordEnter.substring(0,1).concat(stringWordEnter.substring(1,2)).concat(pismeno);
+                                checkWord(stringWordAsk);
+                                break;
+                        }
+                        break;
+                    case 4:
+                        switch (idPicker) {
+                            case 0:
+                                pismeno = Arrays.asList(alphabet).get(picker1.getValue());
+                                stringWordAsk = pismeno.concat(stringWordEnter.substring(1,2).concat(stringWordEnter.substring(2,3)).concat(stringWordEnter.substring(3,4)));
+                                checkWord(stringWordAsk);
+                                break;
+                            case 1:
+                                pismeno = Arrays.asList(alphabet).get(picker2.getValue());
+                                stringWordAsk = stringWordEnter.substring(0,1).concat(pismeno).concat(stringWordEnter.substring(2,3)).concat(stringWordEnter.substring(3,4));
+                                checkWord(stringWordAsk);
+                                break;
+                            case 2:
+                                pismeno = Arrays.asList(alphabet).get(picker3.getValue());
+                                stringWordAsk = stringWordEnter.substring(0,1).concat(stringWordEnter.substring(1,2)).concat(pismeno).concat(stringWordEnter.substring(3,4));
+                                checkWord(stringWordAsk);
+                                break;
+                            case 3:
+                                pismeno = Arrays.asList(alphabet).get(picker4.getValue());
+                                stringWordAsk = stringWordEnter.substring(0,1).concat(stringWordEnter.substring(1,2)).concat(stringWordEnter.substring(2,3)).concat(pismeno);
+                                checkWord(stringWordAsk);
+                                break;
+
+
+                        }
+                        break;
+
+                    case 5:
+                        switch (idPicker) {
+                            case 0:
+                                pismeno = Arrays.asList(alphabet).get(picker1.getValue());
+                                stringWordAsk = pismeno.concat(stringWordEnter.substring(1,2).concat(stringWordEnter.substring(2,3)).concat(stringWordEnter.substring(3,4)).concat(stringWordEnter.substring(4,5)));
+                                checkWord(stringWordAsk);
+                                break;
+                            case 1:
+                                pismeno = Arrays.asList(alphabet).get(picker2.getValue());
+                                stringWordAsk = stringWordEnter.substring(0,1).concat(pismeno).concat(stringWordEnter.substring(2,3)).concat(stringWordEnter.substring(3,4).concat(stringWordEnter.substring(4,5)));
+                                checkWord(stringWordAsk);
+                                break;
+                            case 2:
+                                pismeno = Arrays.asList(alphabet).get(picker3.getValue());
+                                stringWordAsk = stringWordEnter.substring(0,1).concat(stringWordEnter.substring(1,2)).concat(pismeno).concat(stringWordEnter.substring(3,4).concat(stringWordEnter.substring(4,5)));
+                                checkWord(stringWordAsk);
+                                break;
+                            case 3:
+                                pismeno = Arrays.asList(alphabet).get(picker4.getValue());
+                                stringWordAsk = stringWordEnter.substring(0,1).concat(stringWordEnter.substring(1,2)).concat(stringWordEnter.substring(2,3)).concat(pismeno).concat(stringWordEnter.substring(4,5));
+                                checkWord(stringWordAsk);
+                                break;
+
+                            case 4:
+                                pismeno = Arrays.asList(alphabet).get(picker5.getValue());
+                                stringWordAsk = stringWordEnter.substring(0,1).concat(stringWordEnter.substring(1,2)).concat(stringWordEnter.substring(2,3)).concat(stringWordEnter.substring(3,4)).concat(pismeno);
+                                checkWord(stringWordAsk);
+                                break;
+
+                        }
+                        break;
+                }
+
+                if(booleanWordExist){
+                    MediaPlayer mp = MediaPlayer.create(context, R.raw.okword);
+                    if(intSoundSettings==1){
+                        mp.start();
+                    }
+                    stringWordEnter = stringWordAsk;
+                    stringWordHistory = stringWordAsk;
+                    stringLastWord = stringWordAsk;
+                    stringStepsHistory[intHistorySteps]= stringWordAsk;
+                    sb = new StringBuilder();
+                    for(int d=0;d<=intHistorySteps;d++){
+                        sb.append(stringStepsHistory[d]).append(",");
+
+                    }
+                    intHistorySteps++;
+                    editor.putString("historyWords",sb.toString());
+                    editor.putInt("historyCounts",intHistorySteps);
+                    editor.putString("lastWord",stringLastWord);
+                    editor.commit();
+                    loadWordHistory();
+                    LinearLayoutEnterWord.removeAllViews();
+                    loadWordEnter();
+                    frameLayoutEnter[idPicker].setBackground(getDrawable(R.drawable.border_pl));
+                    final Handler handler = new Handler();
+                    final Runnable r = new Runnable() {
+                        public void run() {
+                            frameLayoutEnter[idPicker].setBackground(getDrawable(R.drawable.border_enter));
+                            endHandler= true;
+                            idPicker=-1;
+                        }
+                    };
+
+                    handler.postDelayed(r, 500);
+                    if(stringWordEnter.equals(stringWordExit)){
+                        FrameLayoutStars.setVisibility(View.VISIBLE);
+                        Animation animation = AnimationUtils.loadAnimation(context,R.anim.bounce);
+                        DisplayMetrics dm = new DisplayMetrics();
+                        getWindowManager().getDefaultDisplay().getMetrics(dm);
+                        imageViewStar1.animate().setInterpolator( new BounceInterpolator());
+                        imageViewStar1.animate().setStartDelay(10);
+                        imageViewStar1.animate().setDuration(7000);
+                        imageViewStar1.animate().translationY(dm.heightPixels);
+                        imageViewStar1.animate().start();
+                        //  imageViewStar1.setAnimation(animation);
+                        imageViewStar2.animate().setInterpolator( new BounceInterpolator());
+                        imageViewStar2.animate().setStartDelay(30);
+                        imageViewStar2.animate().setDuration(6000);
+                        imageViewStar2.animate().translationY(dm.heightPixels);
+                        imageViewStar2.animate().start();
+
+                        imageViewStar3.animate().setInterpolator( new BounceInterpolator());
+                        imageViewStar3.animate().setStartDelay(5);
+                        imageViewStar3.animate().setDuration(8000);
+                        imageViewStar3.animate().translationY(dm.heightPixels);
+                        imageViewStar3.animate().start();
+
+                        imageViewStar4.animate().setInterpolator( new BounceInterpolator());
+                        imageViewStar4.animate().setStartDelay(15);
+                        imageViewStar4.animate().setDuration(7000);
+                        imageViewStar4.animate().translationY(dm.heightPixels);
+                        imageViewStar5.animate().start();
+
+                        imageViewStar5.animate().setInterpolator( new BounceInterpolator());
+                        imageViewStar5.animate().setStartDelay(20);
+                        imageViewStar5.animate().setDuration(7000);
+                        imageViewStar5.animate().translationY(dm.heightPixels);
+                        imageViewStar5.animate().start();
+
+
+                        final Handler handler2 = new Handler();
+                        final Runnable r2 = new Runnable() {
+                            public void run() {
+
+                                Intent intent = new Intent(Game.this,PopUpEndRound.class);
+                                intent.putExtra("intlevelik",intLevel);
+                                intent.putExtra("historySteps",intHistorySteps);
+
+                                if(intLevel==intLevelGetIntent){
+                                    intLevel++;
+                                }
+
+
+                                editor.putInt("levelRound",intLevel);
+                                editor.remove("lastWord");
+                                editor.remove("historyCounts");
+                                editor.remove("historyWords");
+                                editor.commit();
+
+                                editor2.putInt("historyCounts",intHistorySteps);
+                                editor2.putString("lastWord",stringLastWord);
+                                editor2.putString("historyWords",sb.toString());
+                                editor2.commit();
+                                startActivity(intent);
+                                finish();
+
+                            }
+                        };
+
+                        handler2.postDelayed(r2, 4000);
+
+                    }
+                }
+                else {
+                    MediaPlayer mp = MediaPlayer.create(context, R.raw.errorsound);
+                    if(intSoundSettings==1){
+                        mp.start();
+                    }
+                    LinearLayoutEnterWord.removeAllViews();
+                    loadWordEnter();
+                    frameLayoutEnter[idPicker].setBackground(getDrawable(R.drawable.border_red));
+                    Animation animation = AnimationUtils.loadAnimation(context,R.anim.shake);
+                    frameLayoutEnter[idPicker].setAnimation(animation);
+                    final Handler handler = new Handler();
+                    final Runnable r = new Runnable() {
+                        public void run() {
+                            frameLayoutEnter[idPicker].setBackground(getDrawable(R.drawable.border_enter));
+                            endHandler= true;
+                            idPicker=-1;
+                        }
+                    };
+
+                    handler.postDelayed(r, 500);
+                }
+
+            }
+            else if(idPicker<0){
+                Toast.makeText(context,getString(R.string.select_letter),Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
 
 }

@@ -1,6 +1,7 @@
 package com.example.davidmacak.etzen;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.DisplayMetrics;
@@ -9,6 +10,10 @@ import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.NumberPicker;
 import android.widget.TextView;
+
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 public class PopUpEndRound extends AppCompatActivity {
 
@@ -21,9 +26,11 @@ public class PopUpEndRound extends AppCompatActivity {
     int intLevel;
     TextView textViewEndRound;
     String nickname;
+    String textPartEndRoud;
 
-    String [] alphabet = { "A", "Á", "B", "C","Č","D", "Ď","E","É","Ě","F","G","H","I", "Í","J","K","L","M","N", "Ň","O","Ó","P","Q","R","Ř","S", "Š","T","Ť","U", "Ú","Ů","V","W","X","Y","Ý","Z","Ž", };
-
+    String [] alphabet = { "A", "Á", "B", "C","Č","D", "Ď","E","É","Ě","F","G","H","I", "Í","J","K","L","M","N", "Ň","O","Ó","P","Q","R","Ř","S", "Š","T","Ť","U", "Ú","Ů","V","W","X","Y","Ý","Z"," ", };
+    SharedPreferences preferences;
+    SharedPreferences.Editor editor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState){
@@ -32,7 +39,31 @@ public class PopUpEndRound extends AppCompatActivity {
         textViewEndRound = findViewById(R.id.textViewEndRound);
         setPickers();
         intLevel = getIntent().getIntExtra("intlevelik",1);
-        textViewEndRound.setText("Uhádl jsi na " +getIntent().getIntExtra("historySteps",1) +". pokus. Vyplň svou přezdívku");
+        textPartEndRoud = (getString(R.string.pop_up_you_part1)+" "+getIntent().getIntExtra("historySteps",1) +getString(R.string.pop_up_you_part2));
+        preferences = getSharedPreferences(String.valueOf(intLevel),MODE_PRIVATE);
+        nickname = preferences.getString("nick","");
+        textViewEndRound.setText(textPartEndRoud);
+        editor = preferences.edit();
+
+        for(int d=0;d<nickname.length()-1;d++){
+            switch (d) {
+                case 0:
+                    picker1.setValue(Arrays.asList(alphabet).indexOf(preferences.getString("nick","").substring(d,d+1)));
+                    break;
+                case 1:
+                    picker2.setValue(Arrays.asList(alphabet).indexOf(preferences.getString("nick","").substring(d,d+1)));
+                    break;
+                case 2:
+                    picker3.setValue(Arrays.asList(alphabet).indexOf(preferences.getString("nick","").substring(d,d+1)));
+                    break;
+                case 3:
+                    picker4.setValue(Arrays.asList(alphabet).indexOf(preferences.getString("nick","").substring(d,d+1)));
+                    break;
+                case 4:
+                    picker5.setValue(Arrays.asList(alphabet).indexOf(preferences.getString("nick","").substring(d,d+1)));
+                    break;
+            }
+        }
     }
 
 
@@ -75,6 +106,10 @@ public class PopUpEndRound extends AppCompatActivity {
         Intent intent = new Intent(PopUpEndRound.this,Game.class);
         intLevel++;
         intent.putExtra("level",intLevel);
+        preferences = getSharedPreferences(String.valueOf(intLevel),MODE_PRIVATE);
+        editor = preferences.edit();
+        editor.putString("nick",nickname);
+        editor.commit();
         startActivity(intent);
         finish();
 

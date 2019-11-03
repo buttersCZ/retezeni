@@ -11,13 +11,14 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
 public class SelectLevel extends AppCompatActivity {
     SharedPreferences preferences;
     int levelRound;
-    Button levelButton[];
+    Button[] levelButton;
     LinearLayout LinearLayoutLevels;
-
+    String level;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -26,12 +27,17 @@ public class SelectLevel extends AppCompatActivity {
         preferences = getSharedPreferences("level",MODE_PRIVATE);
         levelRound = preferences.getInt("levelRound",1);
         LinearLayoutLevels = findViewById(R.id.LinearLayoutLevels);
+
         createButtons();
-
-
     }
 
     public void selectLevel(View view){
+        int q = view.getId();
+        //Control if is openning level actual level.
+        if(q>levelRound){
+            Toast.makeText(this,"Pomalu, nepředbíhej :)",Toast.LENGTH_SHORT).show();
+            return;
+        }
         Intent intent = new Intent(SelectLevel.this,Game.class);
         intent.putExtra("level",view.getId());
         startActivity(intent);
@@ -39,6 +45,7 @@ public class SelectLevel extends AppCompatActivity {
         finish();
 
     }
+
     //Used information about done levels from sharedpreferences and use it to display open levels
     private void createButtons(){
         LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
@@ -56,11 +63,11 @@ public class SelectLevel extends AppCompatActivity {
             }
             else {
                 levelButton[d].setBackground(getDrawable(R.drawable.border_level_na));
-
             }
             levelButton[d].setLayoutParams(layoutParams);
             levelButton[d].setPadding(55,30,55,30);
-            levelButton[d].setText("Level "+d);
+            level = (getString(R.string.level)+" "+d);
+            levelButton[d].setText(level);
             levelButton[d].setTextSize(20);
             levelButton[d].setId(d);
             final int finalD = d;
